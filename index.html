@@ -73,6 +73,31 @@
     background: #1a1405; border: 1px solid #3d3210; color: #e8c98a; font-size: 13px;
   }
 
+  .ca {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    margin: 16px 0 4px; padding: 10px 14px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    color: var(--text); cursor: pointer; text-align: left; font: inherit;
+    transition: border-color .15s, background .15s;
+  }
+  .ca:hover { border-color: #2f6f4a; background: var(--panel-2); }
+  .ca-tick {
+    font: 700 12px/1 var(--mono); letter-spacing: .04em; color: var(--up);
+    padding: 5px 8px; border: 1px solid #1c4030; border-radius: 6px; background: #0f2419;
+    flex: none;
+  }
+  .ca code {
+    font: 13px/1 var(--mono); color: var(--muted); flex: 1 1 auto;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .ca-copy {
+    font: 600 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em;
+    color: var(--accent); flex: none; padding-left: 6px;
+  }
+  .ca.copied { border-color: #2f6f4a; }
+  .ca.copied .ca-copy { color: var(--up); }
+  @media (max-width: 560px) { .ca code { font-size: 11px; } }
+
   .grid { display: grid; gap: 12px; }
   .kpis { grid-template-columns: repeat(auto-fit, minmax(178px, 1fr)); margin-bottom: 22px; }
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
@@ -146,6 +171,12 @@
       <span>Follow @pons_numi_agent</span>
     </a>
   </header>
+
+  <button class="ca" id="ca" type="button" title="Copy contract address">
+    <span class="ca-tick">$NUMI</span>
+    <code id="ca-addr">0xa8fb36136cd439f3ddec90bb713954416b826e8d</code>
+    <span class="ca-copy" id="ca-copy">Copy</span>
+  </button>
 
   <div id="notice" class="notice" hidden></div>
 
@@ -485,6 +516,34 @@ function render(s) {
 // stays close to live.
 const DATA_URL =
   "https://raw.githubusercontent.com/ponsfork/numi-data/main/snapshot.json";
+
+// Copy the contract address on click, with a brief confirmation.
+(function () {
+  const btn = document.getElementById("ca");
+  if (!btn) return;
+  const addr = document.getElementById("ca-addr").textContent.trim();
+  const label = document.getElementById("ca-copy");
+  btn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(addr);
+    } catch {
+      // Clipboard API can be blocked; fall back to a selection-based copy.
+      const r = document.createRange();
+      r.selectNodeContents(document.getElementById("ca-addr"));
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      try { document.execCommand("copy"); } catch { /* ignore */ }
+      sel.removeAllRanges();
+    }
+    btn.classList.add("copied");
+    label.textContent = "Copied ✓";
+    setTimeout(() => {
+      btn.classList.remove("copied");
+      label.textContent = "Copy";
+    }, 1600);
+  });
+})();
 
 async function poll() {
   try {
