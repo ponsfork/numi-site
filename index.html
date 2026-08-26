@@ -303,6 +303,7 @@ function render(s) {
     ),
     kpi("Unrealized", p.unrealizedPnlEth === null ? "—" : plus(p.unrealizedPnlEth) + " ETH", sign(p.unrealizedPnlEth), usd(p.unrealizedPnlEth)),
     kpi("Realized", plus(p.realizedPnlEth) + " ETH", sign(p.realizedPnlEth), "today " + plus(p.realizedTodayEth)),
+    kpi("Fees earned", (p.feesEarnedEth > 0 ? "+" : "") + nf(p.feesEarnedEth) + " ETH", p.feesEarnedEth > 0 ? "up" : "", usd(p.feesEarnedEth) + " · Pons creator fees"),
     kpi("Cash", nf(p.cashEth) + " ETH", "", usd(p.cashEth)),
     kpi(
       "Fills / rejected",
@@ -444,6 +445,14 @@ function render(s) {
       t.balance === null
         ? '<span class="muted">unreadable</span>'
         : nf(t.balance, 6) + " " + esc(t.symbol) + (t.valueEth !== null ? ` <span class="muted">${usd(t.valueEth)}</span>` : ""),
+    ]);
+  }
+  for (const t of (w.extraTokens || [])) {
+    rows.push([
+      "&nbsp;&nbsp;↳ " + esc(t.symbol),
+      t.balance === null
+        ? '<span class="muted">—</span>'
+        : nf(t.balance, 4) + " " + esc(t.symbol) + ' <span class="muted">held</span>',
     ]);
   }
   rows.push(
