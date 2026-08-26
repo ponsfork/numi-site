@@ -113,7 +113,10 @@
   }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 
-  .scroll { overflow-x: auto; }
+  .scroll { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  .scroll::-webkit-scrollbar { height: 6px; }
+  .scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+  .scroll::-webkit-scrollbar-track { background: transparent; }
   table { width: 100%; border-collapse: collapse; font: 13px/1.5 var(--mono); white-space: nowrap; }
   th {
     text-align: left; color: var(--muted); font-weight: 500; font-size: 11px;
@@ -132,6 +135,8 @@
   .tag.buy { color: var(--up); border-color: #1c4030; background: #0f2419; }
   .tag.sell { color: var(--down); border-color: #40201c; background: #24100f; }
   .empty { padding: 26px 16px; color: var(--dim); font-size: 13px; text-align: center; }
+  .addrlink { color: var(--dim); text-decoration: none; font-size: 11px; }
+  .addrlink:hover { color: var(--accent); }
 
   .two { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
   .rows { font: 13px/1.6 var(--mono); }
@@ -238,6 +243,19 @@ let ethUsd = null;
 
 const nf = (v, d = 4) =>
   v === null || v === undefined || !isFinite(v) ? "—" : Number(v).toFixed(d);
+// Price formatter: keeps significant digits for tiny memecoin prices
+// (0.000000 → 1.68e-9) instead of collapsing them to zero.
+const nfp = (v) => {
+  if (v === null || v === undefined || !isFinite(v)) return "—";
+  if (v === 0) return "0";
+  const a = Math.abs(v);
+  if (a >= 0.001) return Number(v).toFixed(6);
+  return Number(v).toExponential(2);
+};
+const trunc = (s, n = 130) => {
+  const t = String(s ?? "—").replace(/\s+/g, " ").trim();
+  return t.length > n ? t.slice(0, n) + "…" : t;
+};
 const usd = (eth) =>
   eth === null || eth === undefined || !isFinite(eth) || !ethUsd
     ? ""
@@ -306,10 +324,10 @@ function render(s) {
     kpi("Fees earned", (p.feesEarnedEth > 0 ? "+" : "") + nf(p.feesEarnedEth) + " ETH", p.feesEarnedEth > 0 ? "up" : "", usd(p.feesEarnedEth) + " · Pons creator fees"),
     kpi("Cash", nf(p.cashEth) + " ETH", "", usd(p.cashEth)),
     kpi(
-      "Fills / rejected",
-      s.stats.fills + " / " + s.stats.rejections,
+      "Trades / holdings",
+      s.stats.fills + " fills",
       "",
-      s.stats.winRatePct === null ? "no closed trades yet" : nf(s.stats.winRatePct, 1) + "% win rate",
+      s.positions.length + " open · " + s.stats.rejections + " skipped",
     ),
   ].join("");
 
@@ -352,11 +370,11 @@ function render(s) {
       s.positions
         .map(
           (x) => `<tr>
-            <td><strong>${esc(x.symbol)}</strong></td>
+            <td><strong>${esc(x.label)}</strong>${x.address ? ` <a class="addrlink" href="${s.links.explorer}/token/${esc(x.address)}" target="_blank" rel="noopener" title="${esc(x.address)}">↗</a>` : ""}</td>
             <td class="muted">${esc(x.assetType)}</td>
-            <td class="num">${nf(x.quantity, 6)}</td>
-            <td class="num">${nf(x.avgCostEth, 6)}</td>
-            <td class="num">${x.markEth === null ? '<span class="muted">unpriced</span>' : nf(x.markEth, 6)}</td>
+            <td class="num">${nf(x.quantity, x.assetType === "memecoin" ? 0 : 6)}</td>
+            <td class="num">${nfp(x.avgCostEth)}</td>
+            <td class="num">${x.markEth === null ? '<span class="muted">unpriced</span>' : nfp(x.markEth)}</td>
             <td class="num">${nf(x.valueEth)} ${x.valueEth !== null ? `<span class="muted">${usd(x.valueEth)}</span>` : ""}</td>
             <td class="num ${sign(x.unrealizedPnlEth)}">${x.unrealizedPnlEth === null ? "—" : plus(x.unrealizedPnlEth, 6)}</td>
             <td class="num ${sign(x.unrealizedPct)}">${x.unrealizedPct === null ? "—" : plus(x.unrealizedPct, 2) + "%"}</td>
@@ -385,10 +403,10 @@ function render(s) {
           (t) => `<tr>
             <td class="muted">${time(t.ts)}</td>
             <td>${esc(t.strategy)}</td>
-            <td><strong>${esc(t.symbol)}</strong></td>
+            <td><strong>${esc(t.label)}</strong></td>
             <td><span class="tag ${t.side}">${esc(t.side)}</span></td>
-            <td class="num">${nf(t.quantity, 6)}</td>
-            <td class="num">${nf(t.priceEth, 6)}</td>
+            <td class="num">${nf(t.quantity, t.assetType === "memecoin" ? 0 : 6)}</td>
+            <td class="num">${nfp(t.priceEth)}</td>
             <td class="num">${nf(t.grossEth, 6)}</td>
             <td class="num muted">${nf(t.gasEth, 6)}</td>
             <td class="num ${sign(t.realizedPnlEth)}">${t.realizedPnlEth === null || t.realizedPnlEth === undefined ? "—" : plus(t.realizedPnlEth, 6)}</td>
@@ -407,9 +425,9 @@ function render(s) {
           (t) => `<tr>
             <td class="muted">${time(t.ts)}</td>
             <td>${esc(t.strategy)}</td>
-            <td>${esc(t.symbol)}</td>
+            <td>${esc(t.label)}</td>
             <td><span class="tag ${t.side}">${esc(t.side)}</span></td>
-            <td class="reason">${esc(t.reason ?? t.riskVerdict ?? "—")}</td>
+            <td class="reason">${esc(trunc(t.reason ?? t.riskVerdict ?? "—"))}</td>
           </tr>`,
         )
         .join("") +
