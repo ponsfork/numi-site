@@ -3,8 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Numi</title>
+<title>Numi — autonomous trading agent</title>
+<meta name="description" content="Numi is an autonomous agent trading stocks and memecoins on-chain. Live portfolio, profit and trade history.">
 <link rel="icon" type="image/png" href="/logo.png">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta property="og:title" content="Numi">
+<meta property="og:description" content="An autonomous agent trading stocks and memecoins on-chain. No humans at the wheel.">
+<meta property="og:image" content="/logo.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@pons_numi_agent">
+<meta name="twitter:image" content="/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -52,9 +61,11 @@
   .ca code { font: 700 13px/1 ui-monospace, Menlo, monospace; color: var(--soft); overflow: hidden; text-overflow: ellipsis; }
   .ca span { color: var(--up); font-size: 13px; font-weight: 900; letter-spacing: .05em; }
 
-  .stats { display: flex; gap: 60px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
-  .stat .v { font-weight: 900; font-size: 54px; letter-spacing: -.03em; line-height: 1.1; }
+  .stats { display: flex; gap: 46px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
+  .stat { min-width: 130px; }
+  .stat .v { font-weight: 900; font-size: 46px; letter-spacing: -.03em; line-height: 1.1; }
   .stat .k { color: var(--soft); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: .12em; margin-top: 6px; }
+  .stat .n { color: var(--soft); font-weight: 700; font-size: 12.5px; margin-top: 2px; opacity: .8; }
   .up { color: var(--up); } .down { color: var(--down); }
 
   .open {
@@ -105,6 +116,11 @@
 
   <div class="stats">
     <div class="stat"><div class="v" id="worth">—</div><div class="k">Portfolio</div></div>
+    <div class="stat">
+      <div class="v" id="profit">—</div>
+      <div class="k">Total profit</div>
+      <div class="n" id="profitNote">fees + trading</div>
+    </div>
     <div class="stat"><div class="v up" id="fees">—</div><div class="k">Fees earned</div></div>
     <div class="stat"><div class="v" id="trades">—</div><div class="k">Trades</div></div>
   </div>
@@ -138,6 +154,20 @@ function render(s){
   E = s.market.ethUsd;
   const w = s.wallet, p = s.portfolio;
   $("worth").textContent = usd(w.netWorthEth ?? w.balanceEth);
+
+  // Everything the agent has actually made: creator fees claimed to the
+  // wallet PLUS the trading result. Deposits are excluded from both legs,
+  // so topping the wallet up never shows as profit.
+  const feesEth = p.feesEarnedEth ?? 0;
+  const tradeEth = p.totalPnlEth ?? 0;
+  const profitEth = feesEth + tradeEth;
+  $("profit").textContent = usdS(profitEth);
+  $("profit").className = "v " + (profitEth > 0 ? "up" : profitEth < 0 ? "down" : "");
+  $("profitNote").textContent =
+    p.totalPnlEth == null
+      ? "fees only — trades unpriced"
+      : `${usdS(feesEth)} fees · ${usdS(tradeEth)} trading`;
+
   $("fees").textContent = usdS(p.feesEarnedEth);
   $("trades").textContent = s.stats.fills;
   $("feed").innerHTML = s.trades.slice(0,6).map(t=>`
