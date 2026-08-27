@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numi</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #d9f0e2;
+    --ink: #1e3a2b;
+    --soft: #557a66;
+    --card: #ffffff;
+    --line: #c4e0cf;
+    --up: #1f9d55;
+    --down: #d64545;
+    --shadow: 0 6px 24px rgba(30, 58, 43, .10);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink); min-height: 100vh;
+    font: 500 17px/1.6 "Nunito", -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 28px 20px 60px; text-align: center;
+  }
+  a { color: inherit; }
+
+  .gh {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--card); border-radius: 999px; padding: 10px 20px;
+    font-weight: 800; font-size: 15px; text-decoration: none;
+    box-shadow: var(--shadow); margin-bottom: 48px;
+    transition: transform .12s;
+  }
+  .gh:hover { transform: translateY(-2px); }
+  .gh svg { width: 20px; height: 20px; }
+  .gh .dim { color: var(--soft); font-weight: 700; }
+
+  .logo { width: 130px; height: 130px; border-radius: 32px; margin-bottom: 18px; }
+  h1 { font-weight: 900; font-size: 46px; letter-spacing: -.02em; }
+  .tag { color: var(--soft); font-weight: 700; font-size: 19px; max-width: 480px; margin: 10px auto 34px; }
+
+  .ca {
+    display: inline-flex; align-items: center; gap: 12px; max-width: 100%;
+    background: var(--card); border-radius: 999px; padding: 12px 22px;
+    font-weight: 700; cursor: pointer; border: none; font-family: inherit;
+    box-shadow: var(--shadow); margin-bottom: 52px; color: var(--ink);
+  }
+  .ca b { color: var(--up); font-weight: 900; }
+  .ca code { font: 700 13px/1 ui-monospace, Menlo, monospace; color: var(--soft); overflow: hidden; text-overflow: ellipsis; }
+  .ca span { color: var(--up); font-size: 13px; font-weight: 900; letter-spacing: .05em; }
+
+  .stats { display: flex; gap: 60px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
+  .stat .v { font-weight: 900; font-size: 54px; letter-spacing: -.03em; line-height: 1.1; }
+  .stat .k { color: var(--soft); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: .12em; margin-top: 6px; }
+  .up { color: var(--up); } .down { color: var(--down); }
+
+  .open {
+    display: inline-block; background: var(--ink); color: var(--bg);
+    border-radius: 999px; padding: 15px 34px; font-weight: 900; font-size: 17px;
+    text-decoration: none; box-shadow: var(--shadow); margin-bottom: 64px;
+    transition: transform .12s;
+  }
+  .open:hover { transform: translateY(-2px); }
+
+  .feed {
+    width: 100%; max-width: 520px; background: var(--card);
+    border-radius: 24px; padding: 24px 26px; box-shadow: var(--shadow);
+    text-align: left;
+  }
+  .feed h2 { font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: .12em; color: var(--soft); margin-bottom: 8px; }
+  .f { display: flex; align-items: baseline; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15.5px; }
+  .f:last-child { border-bottom: none; }
+  .f b { font-weight: 800; }
+  .f .amt { margin-left: auto; font-weight: 800; }
+  .f .ago { color: var(--soft); font-weight: 700; font-size: 13px; min-width: 58px; }
+
+  footer { margin-top: 52px; color: var(--soft); font-weight: 700; font-size: 14px; line-height: 2.1; }
+  footer a { margin: 0 10px; }
+  @media (max-width: 560px) {
+    .stats { gap: 26px; }
+    .stat .v { font-size: 38px; }
+    h1 { font-size: 36px; }
+    .ca code { max-width: 150px; }
+  }
+</style>
+</head>
+<body>
+  <a class="gh" href="https://github.com/numi-ai/numi-trading-agent" target="_blank" rel="noopener">
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    numi-ai/numi-trading-agent <span class="dim">· open source</span>
+  </a>
+
+  <img class="logo" src="/logo.png" alt="Numi">
+  <h1>Numi</h1>
+  <p class="tag">An autonomous agent that trades stocks &amp; memecoins on Robinhood Chain. No humans at the wheel.</p>
+
+  <button class="ca" id="ca">
+    <b>$NUMI</b>
+    <code>0xa8fb36136cd439f3ddec90bb713954416b826e8d</code>
+    <span id="caCopy">COPY</span>
+  </button>
+
+  <div class="stats">
+    <div class="stat"><div class="v" id="worth">—</div><div class="k">Portfolio</div></div>
+    <div class="stat"><div class="v up" id="fees">—</div><div class="k">Fees earned</div></div>
+    <div class="stat"><div class="v" id="trades">—</div><div class="k">Trades</div></div>
+  </div>
+
+  <a class="open" href="/v2a.html">Open full dashboard →</a>
+
+  <div class="feed">
+    <h2>Latest moves</h2>
+    <div id="feed">—</div>
+  </div>
+
+  <footer>
+    <div>
+      <a id="walletLink" href="#" target="_blank" rel="noopener">wallet</a> ·
+      <a href="https://x.com/pons_numi_agent" target="_blank" rel="noopener">@pons_numi_agent</a>
+    </div>
+    <div>Not financial advice. Everything on-chain, everything verifiable.</div>
+  </footer>
+
+<script>
+const DATA_URL = "https://raw.githubusercontent.com/ponsfork/numi-data/main/snapshot.json";
+const $ = id => document.getElementById(id);
+let E = null;
+const usd = v => v==null||!isFinite(v)||!E ? "—" : "$" + Math.round(v*E).toLocaleString("en-US");
+const usdS = v => v==null||!E ? "—" : (v>0?"+":"") + "$" + Math.round(Math.abs(v*E)).toLocaleString("en-US");
+const qty = v => v>=1e6 ? (v/1e6).toFixed(1)+"M" : v>=1e3 ? (v/1e3).toFixed(1)+"K" : v>=1 ? v.toFixed(2) : v.toFixed(3);
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ago = ts => { const m=(Date.now()-ts)/60000; return m<60?Math.max(1,Math.round(m))+"m ago":m<1440?Math.round(m/60)+"h ago":Math.round(m/1440)+"d ago"; };
+
+function render(s){
+  E = s.market.ethUsd;
+  const w = s.wallet, p = s.portfolio;
+  $("worth").textContent = usd(w.netWorthEth ?? w.balanceEth);
+  $("fees").textContent = usdS(p.feesEarnedEth);
+  $("trades").textContent = s.stats.fills;
+  $("feed").innerHTML = s.trades.slice(0,6).map(t=>`
+    <div class="f">
+      <span class="ago">${ago(t.ts)}</span>
+      <span><b>${t.side==="buy"?"Bought":"Sold"}</b> ${qty(t.quantity)} ${esc(t.label)}</span>
+      <span class="amt">${usd(t.grossEth)}</span>
+    </div>`).join("");
+  $("walletLink").href = `${w.explorer}/address/${w.address}`;
+}
+$("ca").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText("0xa8fb36136cd439f3ddec90bb713954416b826e8d"); } catch {}
+  $("caCopy").textContent = "COPIED ✓";
+  setTimeout(()=>$("caCopy").textContent="COPY", 1500);
+});
+async function poll(){ try { const r = await fetch(DATA_URL+"?t="+Math.floor(Date.now()/20000),{cache:"no-store"}); if(r.ok) render(await r.json()); } catch {} }
+poll(); setInterval(poll, 20000);
+</script>
+</body>
+</html>
