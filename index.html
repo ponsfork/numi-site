@@ -145,7 +145,11 @@ const DATA_URL = "https://raw.githubusercontent.com/ponsfork/numi-data/main/snap
 const $ = id => document.getElementById(id);
 let E = null;
 const usd = v => v==null||!isFinite(v)||!E ? "—" : "$" + Math.round(v*E).toLocaleString("en-US");
-const usdS = v => v==null||!E ? "—" : (v>0?"+":"") + "$" + Math.round(Math.abs(v*E)).toLocaleString("en-US");
+// Signed dollars. The minus is not optional: a loss rendered without it
+// reads as a gain.
+const usdS = v =>
+  v==null||!isFinite(v)||!E ? "—"
+    : (v>0?"+":v<0?"−":"") + "$" + Math.round(Math.abs(v*E)).toLocaleString("en-US");
 const qty = v => v>=1e6 ? (v/1e6).toFixed(1)+"M" : v>=1e3 ? (v/1e3).toFixed(1)+"K" : v>=1 ? v.toFixed(2) : v.toFixed(3);
 const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const ago = ts => { const m=(Date.now()-ts)/60000; return m<60?Math.max(1,Math.round(m))+"m ago":m<1440?Math.round(m/60)+"h ago":Math.round(m/1440)+"d ago"; };
