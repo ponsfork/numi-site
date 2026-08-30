@@ -81,7 +81,19 @@
     border-radius: 24px; padding: 24px 26px; box-shadow: var(--shadow);
     text-align: left;
   }
+  .feed + .feed { margin-top: 22px; }
   .feed h2 { font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: .12em; color: var(--soft); margin-bottom: 8px; }
+
+  .h { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .h:last-child { border-bottom: none; }
+  .h .nm { font-weight: 800; font-size: 15.5px; }
+  .h .nm a { color: var(--soft); font-size: 12px; text-decoration: none; }
+  .h .qt { color: var(--soft); font-weight: 700; font-size: 13px; }
+  .h .rt { margin-left: auto; text-align: right; }
+  .h .vl { font-weight: 900; font-size: 15.5px; }
+  .h .pl { font-weight: 800; font-size: 13px; }
+  .vault { color: var(--soft); font-weight: 700; font-size: 13.5px; padding-top: 12px; line-height: 1.7; }
+  .vault b { color: var(--ink); }
   .f { display: flex; align-items: baseline; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15.5px; }
   .f:last-child { border-bottom: none; }
   .f b { font-weight: 800; }
@@ -126,6 +138,12 @@
   </div>
 
   <a class="open" href="/v2a.html">Open full dashboard →</a>
+
+  <div class="feed">
+    <h2>Holding now</h2>
+    <div id="holdings">—</div>
+    <div class="vault" id="vault"></div>
+  </div>
 
   <div class="feed">
     <h2>Latest moves</h2>
@@ -174,6 +192,28 @@ function render(s){
 
   $("fees").textContent = usdS(p.feesEarnedEth);
   $("trades").textContent = s.stats.fills;
+  // What the wallet is holding right now, and how each position is doing.
+  $("holdings").innerHTML = s.positions.length
+    ? s.positions.map(x=>`
+      <div class="h">
+        <div>
+          <div class="nm">${esc(x.label)}${x.address?` <a href="${w.explorer}/token/${x.address}" target="_blank" rel="noopener">↗</a>`:""}</div>
+          <div class="qt">${qty(x.quantity)}</div>
+        </div>
+        <div class="rt">
+          <div class="vl">${x.valueEth==null?"—":usd(x.valueEth)}</div>
+          <div class="pl ${x.unrealizedPct>0?"up":x.unrealizedPct<0?"down":""}">${
+            x.unrealizedPct==null ? "" : (x.unrealizedPct>0?"+":"") + x.unrealizedPct.toFixed(1) + "%"
+          }</div>
+        </div>
+      </div>`).join("")
+    : '<div class="qt">nothing held right now</div>';
+
+  const vault = (w.extraTokens||[]).filter(t=>t.balance>0);
+  $("vault").innerHTML = vault.length
+    ? "🔒 Never sold: " + vault.map(t=>`<b>${qty(t.balance)} ${esc(t.symbol)}</b>`).join(" · ")
+    : "";
+
   $("feed").innerHTML = s.trades.slice(0,6).map(t=>`
     <div class="f">
       <span class="ago">${ago(t.ts)}</span>
